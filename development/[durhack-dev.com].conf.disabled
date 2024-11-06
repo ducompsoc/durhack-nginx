@@ -6,6 +6,6 @@ server {
         include /etc/nginx/snippets/proxy-headers.conf;
     }
 
-    listen [::]:80;
     listen 80;
+    listen [::]:80;
 }
