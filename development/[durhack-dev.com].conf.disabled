@@ -1,4 +1,4 @@
-  GNU nano 6.2                                                                       durhack-dev.com                                                                                server {
+server {
     server_name durhack-dev.com www.durhack-dev.com;
 
     location / {
