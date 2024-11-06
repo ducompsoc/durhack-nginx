@@ -54,11 +54,24 @@ and production.
    ~/Projects$ git clone -- https://<PAT>@github.com/ducompsoc/durhack-nginx.git ./durhack-nginx
    #                         you can specify a different directory to clone into ^^^^^^^^^^^^^^^
    ```
-5. Install [nginx](https://nginx.org/en/) using the [official installation instructions for Ubuntu](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/#installing-prebuilt-ubuntu-packages).
+5. Link the `html` directory to `/var/www/durhack-nginx`
+   ```bash
+   $ cd /var/www
+   /var/www$ sudo mkdir durhack-nginx
+   /var/www$ cd durhack-nginx
+   /var/www/durhack-nginx$ sudo ln -s "$HOME/Projects/durhack-nginx/html" ./html
+   ```
+6. Modify the ACLs (Access-Control Lists) of relevant directories to allow the `nginx` user read permissions on the
+   linked files
+   ```bash
+   $ setfacl -m user:nginx:rx "$HOME" "$HOME/Projects"
+   $ setfacl -Rm user:nginx:rX "/var/www/durhack-nginx"
+   ```
+7. Install [nginx](https://nginx.org/en/) using the [official installation instructions for Ubuntu](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/#installing-prebuilt-ubuntu-packages).
 
    You can choose either method (i.e. 'from an ubuntu repository' vs. 'from the official NGINX repository'); the latter
    is slightly preferable, but the difference doesn't matter for contributing to DurHack projects.
-6. Verify the nginx installation succeeded by querying the status of its `systemd` service:
+8. Verify the nginx installation succeeded by querying the status of its `systemd` service:
    ```bash
    $ sudo systemctl status nginx
    🟢 nginx.service - A high performance web server and a reverse proxy server
@@ -76,7 +89,7 @@ and production.
    7. `systemctl disable [service]`: 'disable' a service
    8. `systemctl edit [service]`: edit the service definition's 'override' file; avoid making changes unless you know what you are doing!
    9. use `systemctl status nginx` again to verify that you left the nginx service **enabled** and **active**.
-7. Navigate to nginx's configuration root and take a look around.
+9. Navigate to nginx's configuration root and take a look around.
    ```bash
    $ cd /etc/nginx
    /etc/nginx$ ls
@@ -87,27 +100,34 @@ and production.
      - `nginx.conf`: the 'root' config file, which invokes nginx's `include` directive to import other nginx config files.
      - `conf.d`: a directory containing configuration files. By convention, one file <-> one site; `nginx.conf` attempts
        to `include` all files whose names end in `.conf` in this directory.
-8. Create a symbolic link in the `conf.d` directory for each file in the `development-sites-available` folder
-   of this repository
-   ```bash
-   /etc/nginx$ cd conf.d
-   /etc/nginx/conf.d$ for file in /home/[username]/Projects/durhack-nginx/development/*; do
-       sudo ln -s $file "./"
-   done
-   /etc/nginx/conf.d$ ls
-   ... '[api.durhack-dev.com].disabled'
-   ```
-9. Enable the sites you desire by renaming the links such that their filenames end in `.conf`
-   ```bash
-   /etc/nginx/sites-enabled$ sudo mv '[api.durhack-dev.com].conf.disabled' '[api.durhack-dev.com].conf'
-   /etc/nginx/sites-enabled$ ls
-   ... '[api.durhack-dev.com].conf'
-   ```
-10. Ask nginx to reload its configuration (i.e. implement the changes you have specified)
+10. Create symbolic links in the `snippets` directory for each file in the `snippets` folder of this repository
+    ```bash
+    /etc/nginx$ cd snippets
+    /etc/nginx/snippets$ sudo ln -s "$HOME"/Projects/durhack-nginx/snippets/* ./
+    /etc/nginx/snippets$ ls
+    ... proxy-headers.conf  server-error.conf ...
+    ```
+11. Create a symbolic link in the `conf.d` directory for each file in the `development-sites-available` folder
+    of this repository
+    ```bash
+    /etc/nginx$ cd conf.d
+    /etc/nginx/conf.d$ for file in "$HOME"/Projects/durhack-nginx/development/*; do
+        sudo ln -s $file "./"
+    done
+    /etc/nginx/conf.d$ ls
+    ... '[api.durhack-dev.com].disabled'
+    ```
+12. Enable the sites you desire by renaming the links such that their filenames end in `.conf`
+    ```bash
+    /etc/nginx/sites-enabled$ sudo mv '[api.durhack-dev.com].conf.disabled' '[api.durhack-dev.com].conf'
+    /etc/nginx/sites-enabled$ ls
+    ... '[api.durhack-dev.com].conf'
+    ```
+13. Ask nginx to reload its configuration (i.e. implement the changes you have specified)
    ```bash
    $ sudo systemctl reload nginx
    ```
-11. Edit your `/etc/hosts` file to map `durhack-dev.com` domain names to local loopback addresses
+14. Edit your `/etc/hosts` file to map `durhack-dev.com` domain names to local loopback addresses
    ```bash
    $ sudo nano /etc/hosts
    ```
@@ -132,7 +152,7 @@ and production.
    ```
    press `ctrl`+`x`, then `y`, then `enter` to save changes and exit.
 
-12. Verify your changes by making an HTTP request:
+15. Verify your changes by making an HTTP request:
    ```bash
    $ curl http://durhack-dev.com
    <html>
@@ -144,16 +164,17 @@ and production.
    </html>
    # 'bad gateway' is good! nginx is working as intended, but the corresponding project's server isn't running yet
    ```
-13. Done! You have successfully installed nginx configurations for DurHack projects. Assuming you have also completed
+16. Done! You have successfully installed nginx configurations for DurHack projects. Assuming you have also completed
     any project-specific setup, you should be ready to develop!
 
 ## Caveats / FAQs
 
-**Q: Why don't the `development` files have `.conf` or `.disabled` extensions like the `production` ones?**
+**Q: Why do the `development` filenames all end with `.disabled`?**
 
-**A:** The extensions determine whether a file is 'enabled' in production.
-The `development` files are neither enabled nor disabled.
-This makes sense - each developer should be able to choose which sites they wish to enable!
+**A:** The `.disabled` extension determines whether a file from `conf.d` is `include`d by the main `nginx.conf`.
+It's convenient to keep them 'disabled' in the repository so that they will be disabled by default
+for any developer that links all of them to `/etc/nginx/conf.d` in one go; this means that
+the likelihood of conflicts with existing nginx configuration is reduced.
 
 **Q: How are the `production` files deployed to the VPS?**
 
