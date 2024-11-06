@@ -3,6 +3,13 @@
 This repository tracks [nginx](https://nginx.org/en/) configuration files used for DurHack projects, both in development
 and production.
 
+## Project Port Number Assignment
+- `ducompsoc/durhack`: 3000-3099
+- `ducompsoc/durhack-guilds`: 3100-3199
+- `ducompsoc/durhack-live`: 3200-3299
+- `ducompsoc/durhack-jury`: 3300-3399
+- `ducompsoc/durhack-deployer`: 3400-3499
+
 ## Directory Structure
 ```text
 .
