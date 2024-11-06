@@ -8,11 +8,11 @@ and production.
 .
 ├── development
 │   ├── ...  # contains development nginx configuration files
-│   └── [api.durhack-dev.com]  # the .conf / .disabled suffix is omitted as development configs are strictly neither
+│   └── [api.durhack-dev.com].conf.disabled  # development site configs are 'disabled' by default
 ├── production
 │   ├── ...  # contains production nginx configuration files
 │   ├── [auth.durhack.com].conf  # an enabled production configuration
-│   └── [api.durhack.com].disabled  # a disabled production configuration
+│   └── [api.durhack.com].conf.disabled  # a disabled production configuration
 └── README.md
 ```
 
@@ -85,15 +85,14 @@ and production.
    ```bash
    /etc/nginx$ cd conf.d
    /etc/nginx/conf.d$ for file in /home/[username]/Projects/durhack-nginx/development/*; do
-       basename="${file/*\//}"
-       sudo ln -s $file "./$basename.disabled"
+       sudo ln -s $file "./"
    done
    /etc/nginx/conf.d$ ls
    ... '[api.durhack-dev.com].disabled'
    ```
 9. Enable the sites you desire by renaming the links such that their filenames end in `.conf`
    ```bash
-   /etc/nginx/sites-enabled$ sudo mv '[api.durhack-dev.com].disabled' '[api.durhack-dev.com].conf'
+   /etc/nginx/sites-enabled$ sudo mv '[api.durhack-dev.com].conf.disabled' '[api.durhack-dev.com].conf'
    /etc/nginx/sites-enabled$ ls
    ... '[api.durhack-dev.com].conf'
    ```
@@ -145,15 +144,15 @@ and production.
 
 **Q: Why don't the `development` files have `.conf` or `.disabled` extensions like the `production` ones?**
 
-**A:** The extensions determine whether a file is 'enabled' in production. 
-The `development` files are neither enabled nor disabled.  
+**A:** The extensions determine whether a file is 'enabled' in production.
+The `development` files are neither enabled nor disabled.
 This makes sense - each developer should be able to choose which sites they wish to enable!
 
 **Q: How are the `production` files deployed to the VPS?**
 
 **A:** See [durhack-deployer](https://github.com/ducompsoc/durhack-deployer), which listens for requests made to
-[deploy.durhack.com](https://deploy.durhack.com). 
-A webhook is configured for this repository such that, when a `push` event occurs (i.e. when commits are pushed), 
+[deploy.durhack.com](https://deploy.durhack.com).
+A webhook is configured for this repository such that, when a `push` event occurs (i.e. when commits are pushed),
 GitHub will make a `POST` request to `https://deploy.durhack.com/github-webhook`, which triggers the deployment
 process for this repository (pull changes, run some commands, tell the nginx service to reload its configuration).
 
@@ -165,7 +164,7 @@ active, though (assuming it was valid) - so the deployer should continue to work
 **Q: What happens if the `deploy.durhack.com` site is disabled?**
 
 **A:** The production deployer (`durhack-deployer`) will break. Someone technically minded will have
-to 
+to
 1. connect to the VPS using `ssh` and manually re-enable the site to fix automatic deployment
 2. re-enable any repository webhooks that were disabled due to failed event deliveries
 3. trigger deployments for all DurHack projects whose repositories received commits while the deployer was unavailable
