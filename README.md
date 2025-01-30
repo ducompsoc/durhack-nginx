@@ -15,11 +15,11 @@ and production.
 .
 ├── development
 │   ├── ...  # contains development nginx configuration files
-│   └── [api.durhack-dev.com].conf.disabled  # development site configs are 'disabled' by default
+│   └── [api.durhack-dev.com].nginxconf.disabled  # development site configs are 'disabled' by default
 ├── production
 │   ├── ...  # contains production nginx configuration files
-│   ├── [auth.durhack.com].conf  # an enabled production configuration
-│   └── [api.durhack.com].conf.disabled  # a disabled production configuration
+│   ├── [auth.durhack.com].nginxconf  # an enabled production configuration
+│   └── [api.durhack.com].nginxconf.disabled  # a disabled production configuration
 └── README.md
 ```
 
@@ -100,14 +100,24 @@ and production.
      - `nginx.conf`: the 'root' config file, which invokes nginx's `include` directive to import other nginx config files.
      - `conf.d`: a directory containing configuration files. By convention, one file <-> one site; `nginx.conf` attempts
        to `include` all files whose names end in `.conf` in this directory.
-10. Create symbolic links in the `snippets` directory for each file in the `snippets` folder of this repository
+10. Edit the `nginx.conf` file such that it includes configuration files from `conf.d` whose names end with `.nginxconf`.
+   ```bash
+   sudo nano nginx.conf
+   ```
+   ```nginxconf
+   # ...
+   include /etc/nginx/conf.d/*.conf;
+   include /etc/nginx/conf.d/*.nginxconf;
+   # ...
+   ```
+11. Create symbolic links in the `snippets` directory for each file in the `snippets` folder of this repository
     ```bash
     /etc/nginx$ cd snippets
     /etc/nginx/snippets$ sudo ln -s "$HOME"/Projects/durhack-nginx/snippets/* ./
     /etc/nginx/snippets$ ls
-    ... proxy-headers.conf  server-error.conf ...
+    ... proxy-headers.nginxconf  server-error.nginxconf ...
     ```
-11. Create a symbolic link in the `conf.d` directory for each file in the `development-sites-available` folder
+12. Create a symbolic link in the `conf.d` directory for each file in the `development-sites-available` folder
     of this repository
     ```bash
     /etc/nginx$ cd conf.d
@@ -115,19 +125,19 @@ and production.
         sudo ln -s $file "./"
     done
     /etc/nginx/conf.d$ ls
-    ... '[api.durhack-dev.com].disabled'
+    ... '[api.durhack-dev.com].nginxconf.disabled'
     ```
-12. Enable the sites you desire by renaming the links such that their filenames end in `.conf`
+13. Enable the sites you desire by renaming the links such that their filenames end in `.conf` or `.nginxconf`
     ```bash
-    /etc/nginx/sites-enabled$ sudo mv '[api.durhack-dev.com].conf.disabled' '[api.durhack-dev.com].conf'
+    /etc/nginx/sites-enabled$ sudo mv '[api.durhack-dev.com].nginxconf.disabled' '[api.durhack-dev.com].nginxconf'
     /etc/nginx/sites-enabled$ ls
-    ... '[api.durhack-dev.com].conf'
+    ... '[api.durhack-dev.com].nginxconf'
     ```
-13. Ask nginx to reload its configuration (i.e. implement the changes you have specified)
+14. Ask nginx to reload its configuration (i.e. implement the changes you have specified)
    ```bash
    $ sudo systemctl reload nginx
    ```
-14. Edit your `/etc/hosts` file to map `durhack-dev.com` domain names to local loopback addresses
+15. Edit your `/etc/hosts` file to map `durhack-dev.com` domain names to local loopback addresses
    ```bash
    $ sudo nano /etc/hosts
    ```
@@ -152,7 +162,7 @@ and production.
    ```
    press `ctrl`+`x`, then `y`, then `enter` to save changes and exit.
 
-15. Verify your changes by making an HTTP request:
+16. Verify your changes by making an HTTP request:
    ```bash
    $ curl http://durhack-dev.com
    <html>
@@ -164,7 +174,7 @@ and production.
    </html>
    # 'bad gateway' is good! nginx is working as intended, but the corresponding project's server isn't running yet
    ```
-16. Done! You have successfully installed nginx configurations for DurHack projects. Assuming you have also completed
+17. Done! You have successfully installed nginx configurations for DurHack projects. Assuming you have also completed
     any project-specific setup, you should be ready to develop!
 
 ## Caveats / FAQs
