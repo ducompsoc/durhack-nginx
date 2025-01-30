@@ -1,10 +1,10 @@
 server {
     server_name jury.durhack-dev.com;
 
-    include /etc/nginx/snippets/server-error.conf;
+    include /etc/nginx/snippets/server-error.nginxconf;
 
     location /api {
-        include /etc/nginx/snippets/proxy-headers.conf;
+        include /etc/nginx/snippets/proxy-headers.nginxconf;
         proxy_pass http://127.0.0.1:3301$request_uri;
     }
 

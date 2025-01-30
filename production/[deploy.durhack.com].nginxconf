@@ -3,11 +3,11 @@ server {
 
     client_max_body_size 1M;
 
-    include /etc/nginx/snippets/advertise-http3-headers.conf;
-    include /etc/nginx/snippets/server-error.conf;
+    include /etc/nginx/snippets/advertise-http3-headers.nginxconf;
+    include /etc/nginx/snippets/server-error.nginxconf;
 
     location / {
-        include /etc/nginx/snippets/uwsgi-params.conf;
+        include /etc/nginx/snippets/uwsgi-params.nginxconf;
         uwsgi_pass localhost:3400;
     }
 
@@ -18,7 +18,7 @@ server {
     listen [::]:443 ssl;
     ssl_certificate /etc/letsencrypt/live/deploy.durhack.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/deploy.durhack.com/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
+    include /etc/letsencrypt/options-ssl-nginx.nginxconf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 }
 

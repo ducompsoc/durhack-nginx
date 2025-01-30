@@ -1,13 +1,13 @@
 server {
     server_name guilds.durhack.com;
 
-    include /etc/nginx/snippets/advertise-http3-headers.conf;
-    include /etc/nginx/snippets/proxy-headers.conf;
+    include /etc/nginx/snippets/advertise-http3-headers.nginxconf;
+    include /etc/nginx/snippets/proxy-headers.nginxconf;
 
     ssl_client_certificate /etc/tls/certs/durhack-ca-E1-chain.cert.pem;
     ssl_verify_client optional;
 
-    include /etc/nginx/snippets/server-error.conf;
+    include /etc/nginx/snippets/server-error.nginxconf;
 
     location /api/interop {
         if ($ssl_client_escaped_cert = "") { return 401; }
@@ -34,7 +34,7 @@ server {
     listen [::]:443 default_server ssl reuseport;
     ssl_certificate /etc/letsencrypt/live/guilds.durhack.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/guilds.durhack.com/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
+    include /etc/letsencrypt/options-ssl-nginx.nginxconf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 }
 

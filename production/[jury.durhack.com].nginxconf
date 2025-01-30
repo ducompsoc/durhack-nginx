@@ -1,11 +1,11 @@
 server {
     server_name jury.durhack.com;
 
-    include /etc/nginx/snippets/advertise-http3-headers.conf;
-    include /etc/nginx/snippets/server-error.conf;
+    include /etc/nginx/snippets/advertise-http3-headers.nginxconf;
+    include /etc/nginx/snippets/server-error.nginxconf;
 
     location /api {
-        include /etc/nginx/snippets/proxy-headers.conf;
+        include /etc/nginx/snippets/proxy-headers.nginxconf;
         proxy_pass http://127.0.0.1:3301$request_uri;
     }
 
@@ -41,7 +41,7 @@ server {
     listen [::]:443 ssl;
     ssl_certificate /etc/letsencrypt/live/guilds.durhack.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/guilds.durhack.com/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
+    include /etc/letsencrypt/options-ssl-nginx.nginxconf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 }
 
