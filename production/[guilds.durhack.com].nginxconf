@@ -34,7 +34,7 @@ server {
     listen [::]:443 default_server ssl reuseport;
     ssl_certificate /etc/letsencrypt/live/guilds.durhack.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/guilds.durhack.com/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.nginxconf;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 }
 
