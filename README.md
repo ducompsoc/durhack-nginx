@@ -34,14 +34,19 @@ and production.
    2. first, [check for existing SSH keys on your machine](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/checking-for-existing-ssh-keys).
    3. next, [generate a new SSH key and add it to the ssh-agent](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
    4. finally, [add your new SSH key to your GitHub account](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
-3. Navigate using `cd` to someplace you are happy to keep the project, for example `~/Projects`
+3. Install pre-requisites:
+   ```bash
+   $ sudo apt install acl
+   ```
+4. Navigate using `cd` to someplace you are happy to keep the project, for example `~/Projects`
    ```bash
    $ cd ~  # change directory to your 'home' directory (usually /home/[username])
    ~$ mkdir -p Projects  # create the directory 'Projects' if it does not exist
+   ~$ setfacl -d -m o::- Projects  # set default permissions for new subnodes to disallow reading
    ~$ cd Projects  # change directory to 'Projects' inside your current working directory
    ~/Projects$
    ```
-4. Check out the repository
+5. Check out the repository
    ```bash
    # If you set up SSH keys...
    ~/Projects$ git clone -- git@github.com:ducompsoc/durhack-nginx.git ./durhack-nginx
@@ -54,24 +59,25 @@ and production.
    ~/Projects$ git clone -- https://<PAT>@github.com/ducompsoc/durhack-nginx.git ./durhack-nginx
    #                         you can specify a different directory to clone into ^^^^^^^^^^^^^^^
    ```
-5. Link the `html` directory to `/var/www/durhack-nginx`
+6. Link the `html` directory to `/var/www/durhack-nginx`
    ```bash
    $ cd /var/www
    /var/www$ sudo mkdir durhack-nginx
    /var/www$ cd durhack-nginx
    /var/www/durhack-nginx$ sudo ln -s "$HOME/Projects/durhack-nginx/html" ./html
    ```
-6. Modify the ACLs (Access-Control Lists) of relevant directories to allow the `nginx` user read permissions on the
+7. Modify the ACLs (Access-Control Lists) of relevant directories to allow the `nginx` user read permissions on the
    linked files
    ```bash
-   $ setfacl -m user:nginx:rx "$HOME" "$HOME/Projects"
-   $ setfacl -Rm user:nginx:rX "/var/www/durhack-nginx"
+   $ setfacl -m user:nginx:x "$HOME"
+   $ # 'x' permission for 'others' on the "$HOME/Projects" directory is assumed
+   $ setfacl -Rm user:nginx:rX "$HOME/Projects/durhack-nginx"
    ```
-7. Install [nginx](https://nginx.org/en/) using the [official installation instructions for Ubuntu](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/#installing-prebuilt-ubuntu-packages).
+8. Install [nginx](https://nginx.org/en/) using the [official installation instructions for Ubuntu](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/#installing-prebuilt-ubuntu-packages).
 
    You can choose either method (i.e. 'from an ubuntu repository' vs. 'from the official NGINX repository'); the latter
    is slightly preferable, but the difference doesn't matter for contributing to DurHack projects.
-8. Verify the nginx installation succeeded by querying the status of its `systemd` service:
+9. Verify the nginx installation succeeded by querying the status of its `systemd` service:
    ```bash
    $ sudo systemctl status nginx
    🟢 nginx.service - A high performance web server and a reverse proxy server
@@ -89,7 +95,7 @@ and production.
    7. `systemctl disable [service]`: 'disable' a service
    8. `systemctl edit [service]`: edit the service definition's 'override' file; avoid making changes unless you know what you are doing!
    9. use `systemctl status nginx` again to verify that you left the nginx service **enabled** and **active**.
-9. Navigate to nginx's configuration root and take a look around.
+10. Navigate to nginx's configuration root and take a look around.
    ```bash
    $ cd /etc/nginx
    /etc/nginx$ ls
@@ -100,7 +106,7 @@ and production.
      - `nginx.conf`: the 'root' config file, which invokes nginx's `include` directive to import other nginx config files.
      - `conf.d`: a directory containing configuration files. By convention, one file <-> one site; `nginx.conf` attempts
        to `include` all files whose names end in `.conf` in this directory.
-10. Edit the `nginx.conf` file such that it includes configuration files from `conf.d` whose names end with `.nginxconf`.
+11. Edit the `nginx.conf` file such that it includes configuration files from `conf.d` whose names end with `.nginxconf`.
    ```bash
    sudo nano nginx.conf
    ```
@@ -110,14 +116,14 @@ and production.
    include /etc/nginx/conf.d/*.nginxconf;
    # ...
    ```
-11. Create symbolic links in the `snippets` directory for each file in the `snippets` folder of this repository
+12. Create symbolic links in the `snippets` directory for each file in the `snippets` folder of this repository
     ```bash
     /etc/nginx$ cd snippets
     /etc/nginx/snippets$ sudo ln -s "$HOME"/Projects/durhack-nginx/snippets/* ./
     /etc/nginx/snippets$ ls
     ... proxy-headers.nginxconf  server-error.nginxconf ...
     ```
-12. Create a symbolic link in the `conf.d` directory for each file in the `development-sites-available` folder
+13. Create a symbolic link in the `conf.d` directory for each file in the `development-sites-available` folder
     of this repository
     ```bash
     /etc/nginx$ cd conf.d
@@ -127,17 +133,17 @@ and production.
     /etc/nginx/conf.d$ ls
     ... '[api.durhack-dev.com].nginxconf.disabled'
     ```
-13. Enable the sites you desire by renaming the links such that their filenames end in `.conf` or `.nginxconf`
+14. Enable the sites you desire by renaming the links such that their filenames end in `.conf` or `.nginxconf`
     ```bash
     /etc/nginx/sites-enabled$ sudo mv '[api.durhack-dev.com].nginxconf.disabled' '[api.durhack-dev.com].nginxconf'
     /etc/nginx/sites-enabled$ ls
     ... '[api.durhack-dev.com].nginxconf'
     ```
-14. Ask nginx to reload its configuration (i.e. implement the changes you have specified)
+15. Ask nginx to reload its configuration (i.e. implement the changes you have specified)
    ```bash
    $ sudo systemctl reload nginx
    ```
-15. Edit your `/etc/hosts` file to map `durhack-dev.com` domain names to local loopback addresses
+16. Edit your `/etc/hosts` file to map `durhack-dev.com` domain names to local loopback addresses
    ```bash
    $ sudo nano /etc/hosts
    ```
@@ -162,7 +168,7 @@ and production.
    ```
    press `ctrl`+`x`, then `y`, then `enter` to save changes and exit.
 
-16. Verify your changes by making an HTTP request:
+17. Verify your changes by making an HTTP request:
    ```bash
    $ curl http://durhack-dev.com
    <html>
@@ -174,7 +180,7 @@ and production.
    </html>
    # 'bad gateway' is good! nginx is working as intended, but the corresponding project's server isn't running yet
    ```
-17. Done! You have successfully installed nginx configurations for DurHack projects. Assuming you have also completed
+18. Done! You have successfully installed nginx configurations for DurHack projects. Assuming you have also completed
     any project-specific setup, you should be ready to develop!
 
 ## Caveats / FAQs
