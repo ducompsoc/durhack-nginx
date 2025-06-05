@@ -99,10 +99,9 @@ and production.
    ```bash
    $ cd /etc/nginx
    /etc/nginx$ ls
-   conf.d  fastcgi.conf  fastcgi_params  koi-utf  koi-win  mime.types  modules-available  modules-enabled  nginx.conf
-   proxy_params  scgi_params  sites-available  sites-enabled  snippets  uwsgi_params  win-utf
+   conf.d  fastcgi_params  mime.types  modules  nginx.conf  scgi_params  snippets  uwsgi_params
    ```
-   The relevant entries are
+   The most relevant entries are
      - `nginx.conf`: the 'root' config file, which invokes nginx's `include` directive to import other nginx config files.
      - `conf.d`: a directory containing configuration files. By convention, one file <-> one site; `nginx.conf` attempts
        to `include` all files whose names end in `.conf` in this directory.
@@ -141,7 +140,9 @@ and production.
     ```
 15. Ask nginx to reload its configuration (i.e. implement the changes you have specified)
    ```bash
-   $ sudo systemctl reload nginx
+   $ sudo systemctl reload nginx  # soft-reload: ask running nginx process to re-read config
+   $ sudo systemctl restart nginx  # hard-reload: stop nginx process, then start it again
+   $ journalctl -xeu nginx  # view nginx journal - press 'q' to get out if it starts an interactive viewer
    ```
 16. Edit your `/etc/hosts` file to map `durhack-dev.com` domain names to local loopback addresses
    ```bash
