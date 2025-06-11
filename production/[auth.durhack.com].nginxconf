@@ -5,10 +5,6 @@ server {
     include /etc/nginx/snippets/proxy-headers.nginxconf;
     include /etc/nginx/snippets/server-error.nginxconf;
 
-    location /js {
-        proxy_pass http://127.0.0.1:3300$request_uri;
-    }
-
     location /realms {
         proxy_pass http://127.0.0.1:3300$request_uri;
     }
