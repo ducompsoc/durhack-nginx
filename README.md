@@ -1,4 +1,4 @@
-# durhack-deployer
+# durhack-nginx
 
 This repository tracks [nginx](https://nginx.org/en/) configuration files used for DurHack projects, both in development
 and production.
