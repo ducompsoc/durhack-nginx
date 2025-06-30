@@ -122,7 +122,7 @@ and production.
     /etc/nginx/snippets$ ls
     ... proxy-headers.nginxconf  server-error.nginxconf ...
     ```
-13. Create a symbolic link in the `conf.d` directory for each file in the `development-sites-available` folder
+13. Create a symbolic link in the `conf.d` directory for each file in the `development` folder
     of this repository
     ```bash
     /etc/nginx$ cd conf.d
@@ -134,8 +134,8 @@ and production.
     ```
 14. Enable the sites you desire by renaming the links such that their filenames end in `.conf` or `.nginxconf`
     ```bash
-    /etc/nginx/sites-enabled$ sudo mv '[api.durhack-dev.com].nginxconf.disabled' '[api.durhack-dev.com].nginxconf'
-    /etc/nginx/sites-enabled$ ls
+    /etc/nginx/conf.d$ sudo mv '[api.durhack-dev.com].nginxconf.disabled' '[api.durhack-dev.com].nginxconf'
+    /etc/nginx/conf.d$ ls
     ... '[api.durhack-dev.com].nginxconf'
     ```
 15. Ask nginx to reload its configuration (i.e. implement the changes you have specified)
