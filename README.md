@@ -161,8 +161,8 @@ and production.
    127.0.0.1       live.durhack-dev.com
    ::1             live.durhack-dev.com
 
-   127.0.0.1       megateams.durhack-dev.com
-   ::1             megateams.durhack-dev.com
+   127.0.0.1       guilds.durhack-dev.com
+   ::1             guilds.durhack-dev.com
 
    127.0.0.1       jury.durhack-dev.com
    ::1             jury.durhack-dev.com
