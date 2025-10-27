@@ -29,9 +29,9 @@ server {
 }
 
 server {
-    server_name jury.durhack.com;
+    server_name live.durhack.com;
 
-    if ($host = jury.durhack.com) {
+    if ($host = live.durhack.com) {
         return 301 https://$host$request_uri;
     }
 
