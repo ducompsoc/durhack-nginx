@@ -1,3 +1,21 @@
+map $host $destination_url {
+  default 0;
+  
+  2019.durhack.com https://archive-2019--durhack-legacy.netlify.app/;
+  2020.durhack.com https://archive-2020--durhack-legacy.netlify.app/;
+  2021.durhack.com https://archive-2021--durhack-legacy.netlify.app/;
+  2022.durhack.com https://archive-2021--durhack-legacy.netlify.app/;
+  2023.durhack.com https://archive-2023--durhack-legacy.netlify.app/;
+  2024.durhack.com https://archive-2024--durhack.netlify.app/;
+
+  code.durhack.com https://github.com/ducompsoc/durhack;
+  github.durhack.com https://github.com/ducompsoc/durhack;
+  
+  wiki.durhack.com https://app.nuclino.com/DurHack;
+
+  drive.durhack.com https://drive.google.com/drive/folders/0APAGoGHY7WqNUk9PVA;
+}
+
 server {
     server_name *.durhack.com;
 
@@ -17,6 +35,10 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/durhack.com/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    if ($destination_url) {
+        return 302 $destination_url;
+    }
 
     location / {
         # it is necessary for this to be inside a `location` directive for
