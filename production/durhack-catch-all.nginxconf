@@ -13,10 +13,6 @@ server {
     listen 443 ssl;
     listen [::]:443 ssl;
 
-    # HTTP
-    listen 80;
-    listen [::]:80;
-
     ssl_certificate /etc/letsencrypt/live/durhack.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/durhack.com/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
@@ -29,3 +25,16 @@ server {
     }
 }
 
+server {
+    server_name *.durhack.com;
+
+    if ($host ~* "\.durhack\.com$") {
+        return 301 https://$host$request_uri;
+    }
+
+    return 404;
+
+    # HTTP
+    listen 80;
+    listen [::]:80;
+}
