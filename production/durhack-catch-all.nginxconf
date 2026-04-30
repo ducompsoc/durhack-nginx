@@ -4,7 +4,7 @@ map $host $destination_url {
   2019.durhack.com https://archive-2019--durhack-legacy.netlify.app/;
   2020.durhack.com https://archive-2020--durhack-legacy.netlify.app/;
   2021.durhack.com https://archive-2021--durhack-legacy.netlify.app/;
-  2022.durhack.com https://archive-2021--durhack-legacy.netlify.app/;
+  2022.durhack.com https://archive-2022--durhack-legacy.netlify.app/;
   2023.durhack.com https://archive-2023--durhack-legacy.netlify.app/;
   2024.durhack.com https://archive-2024--durhack.netlify.app/;
 
